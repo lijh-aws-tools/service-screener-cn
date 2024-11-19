@@ -17,7 +17,17 @@ class S3Bucket(Evaluator):
         
         self.init()
 
-    def policyAllowsPublicRead (self, policy_document):
+    def policyIsPublic (self, bucket, policy_document):
+        # Check if the policy allows public read access
+        # Check if the policy allows public read access
+        policy_is_public = False
+        if policy_document:
+            policy_status = self.s3Client.get_bucket_policy_status(Bucket=bucket)
+            policy_is_public = policy_status['PolicyStatus']['IsPublic']
+            #print("Bucket Policy of "+ bucket + " is Public: ", policy_is_public)
+        return policy_is_public
+
+    def policyAllowsPublicRead (self, bucket, policy_document):
         # Check if the policy allows public read access
         # Check if the policy allows public read access
         response = None
@@ -132,23 +142,37 @@ class S3Bucket(Evaluator):
         
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchAcl':
-                return None
-        
+                return None        
+
 
         # check if S3 bucket has prohibited public reads 
-        policy = self.getBucketPolicy()    
 
-
-        if (public_policy_restricted or not self.policyAllowsPublicRead(policy)) and (public_acl_restricted or not self.aclAllowsPublicRead(bucket_acl)):
-            self.results['PublicReadAccessBlock'] = [1, 'Prohibited'] 
+        policy = self.getBucketPolicy()
+        if self.policyIsPublic(self.bucket,policy):  
+            self.results['BucketIsPublic'] = [1,"IsPublic"]
         else:
-            self.results['PublicReadAccessBlock'] = [-1, 'NotProhibited'] 
+            self.results['BucketIsPublic'] = [0,"NotPublic"]
+
+        #if public_acl_restricted or not self.aclAllowsPublicRead(bucket_acl):
+        #    self.results['PublicReadAclBlock'] = [1, 'Prohibited'] 
+        #else:
+        #    self.results['PublicReadAclBlock'] = [0, 'NotProhibited']
+
+        #if public_acl_restricted or not self.aclAllowsPublicWrite(bucket_acl):
+        #    self.results['PublicWriteAclBlock'] = [1, 'Prohibited'] 
+        #else:
+        #    self.results['PublicWriteAclBlock'] = [0, 'NotProhibited']
+
+        #if (public_policy_restricted or not self.policyAllowsPublicRead(self.bucket, policy)) and (public_acl_restricted or not self.aclAllowsPublicRead(bucket_acl)):
+        #    self.results['PublicReadAccessBlock'] = [1, 'Prohibited'] 
+        #else:
+        #    self.results['PublicReadAccessBlock'] = [-1, 'NotProhibited'] 
         
         # check if S3 bucket has prohibited public writes 
-        if (public_policy_restricted or not self.policyAllowsPublicWrite(policy)) and (public_acl_restricted or not self.aclAllowsPublicWrite(bucket_acl)):
-            self.results['PublicWriteAccessBlock'] = [1, 'Prohibited'] 
-        else:
-            self.results['PublicWriteAccessBlock'] = [-1, 'NotProhibited'] 
+        #if (public_policy_restricted or not self.policyAllowsPublicWrite(self.bucket, policy)) and (public_acl_restricted or not self.aclAllowsPublicWrite(bucket_acl)):
+        #    self.results['PublicWriteAccessBlock'] = [1, 'Prohibited'] 
+        #else:
+        #    self.results['PublicWriteAccessBlock'] = [-1, 'NotProhibited'] 
 
     
     def _checkMfaDeleteAndVersioning(self):

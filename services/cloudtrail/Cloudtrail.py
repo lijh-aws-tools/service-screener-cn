@@ -18,7 +18,7 @@ class Cloudtrail(Service):
         ssBoto = self.ssBoto
         self.ctClient = ssBoto.client('cloudtrail', config=self.bConfig)
         self.snsClient = ssBoto.client('sns', config=self.bConfig)
-        self.s3Client = ssBoto.client('s3')
+        self.s3Client = ssBoto.client('s3', config=self.bConfig)
         
     def getTrails(self):
         results = []

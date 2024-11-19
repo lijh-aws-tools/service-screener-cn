@@ -26,7 +26,13 @@ class Service:
         self.RULESPREFIX = classname + '::rules'
         self.region = region
         self.bConfig = bConfig(
-            region_name = region    
+            region_name=region,
+            connect_timeout=2,
+            read_timeout=2,
+            retries={'max_attempts': 1},
+            signature_version='v4',
+            # Add proxy settings if needed
+            proxies={'http': '', 'https': ''}
         )
         
         self.charts = {}
@@ -88,7 +94,7 @@ class Service:
             f.write('\r\n'.join(items[ke]) + '\r\n')
         f.close()
             
-        
+        print("I am Here", self.RULESPREFIX)
         Config.set(self.RULESPREFIX, [])
         
     def setTags(self, tags):
@@ -165,5 +171,5 @@ class Service:
 if __name__ == "__main__":
     Config.init()
     Config.set('_AWS_OPTIONS', {'signature': 'ok'})
-    r = 'ap-southeast-1'
+    r = 'cn-north-1'
     o = Service(r)

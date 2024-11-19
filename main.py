@@ -63,7 +63,7 @@ _AWS_OPTIONS = {
 Config.set("_SS_PARAMS", _cli_options)
 Config.set("_AWS_OPTIONS", _AWS_OPTIONS)
 
-defaultSessionRegion = 'us-east-1'
+defaultSessionRegion = 'cn-north-1'
 
 boto3args = {'region_name': defaultSessionRegion}
 profile = _cli_options['profile']
@@ -141,6 +141,7 @@ for acctId, cred in rolesCred.items():
         # regions = AwsRegionSelector.get_all_enabled_regions(True)
         ## Can pass in True for RegionSelector to skip prompt
         regions = AwsRegionSelector.get_all_enabled_regions(flagSkipPromptForRegionConfirmation)
+        print(regions)
     
     
     if acctLoop == 1:
@@ -150,9 +151,10 @@ for acctId, cred in rolesCred.items():
     if len(_cli_options['frameworks']) > 0:
         frameworks = _cli_options['frameworks'].split(',')
     
-    tempConfig = _AWS_OPTIONS.copy();
+    tempConfig = _AWS_OPTIONS.copy()
     tempConfig['region'] = regions[0]
     
+
     Config.setAccountInfo(tempConfig)
     acctInfo = Config.get('stsInfo')
     print("")
@@ -200,7 +202,7 @@ for acctId, cred in rolesCred.items():
             cfnAdditionalStr = " --mpeid:{}".format(mpeid)
         CfnTrailObj.boto3init(cfnAdditionalStr)
         CfnTrailObj.createStack()
-    
+
     overallTimeStart = time.time()
     # os.chdir('__fork')
     directory = '__fork'
@@ -210,14 +212,15 @@ for acctId, cred in rolesCred.items():
     files_in_directory = os.listdir(directory)
     filtered_files = [file for file in files_in_directory if (file.endswith(".json") or file=='all.csv')]
     for file in filtered_files:
-    	path_to_file = os.path.join(directory, file)
-    	os.remove(path_to_file)
+        path_to_file = os.path.join(directory, file)
+        os.remove(path_to_file)
     
     with open(directory + '/tail.txt', 'w') as fp:
         pass
     
     special_services = {'iam', 's3'}
     input_ranges = {}
+
 
     ## Make IAM and S3 to be separate pool
     if 'iam' in services:
@@ -229,11 +232,13 @@ for acctId, cred in rolesCred.items():
         input_ranges['s3'] = ('s3', regions, filters)
 
     input_ranges = list(input_ranges.values())
+    print("input_ranges", input_ranges)
 
     pool = Pool(processes=int(workerCounts))
     pool.starmap(Screener.scanByService, input_ranges)
     pool.close()
 
+    print("pool.close")
     if testmode == False:
         CfnTrailObj.deleteStack()
     
@@ -299,8 +304,8 @@ for acctId, cred in rolesCred.items():
     files_in_directory = os.listdir(directory)
     filtered_folders = [folder for folder in files_in_directory if folder.endswith("XX")]
     for folder in filtered_folders:
-    	path_to_folder = os.path.join(directory, folder)
-    	shutil.rmtree(path_to_folder)
+        path_to_folder = os.path.join(directory, folder)
+        shutil.rmtree(path_to_folder)
 
     os.chdir(_C.ROOT_DIR)
     filetodel = _C.ROOT_DIR + '/output.zip'

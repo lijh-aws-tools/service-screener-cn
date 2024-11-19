@@ -5,7 +5,16 @@ from utils.Config import Config
 class Cloudwatch:
     def __init__(self, region):
         ssBoto = Config.get('ssBoto')
-        self.cwClient = ssBoto.client('cloudwatch', config=bConfig(region_name=region))
+        cwConfig = bConfig(
+            region_name=region,
+            connect_timeout=2,
+            read_timeout=2,
+            retries={'max_attempts': 1},
+            signature_version='v4',
+            # Add proxy settings if needed
+            proxies={'http': '', 'https': ''}
+        )
+        self.cwClient = ssBoto.client('cloudwatch', config=cwConfig)
     
     def getClient(self):
         return self.cwClient

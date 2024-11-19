@@ -61,10 +61,8 @@ def aws_parseInstanceFamily(instanceFamily: str, region=None) -> Dict[str, str]:
     else:
         p = arr[0]
         s = arr[1]
-
     patterns = r"([a-zA-Z]+)(\d+)([a-zA-Z]*)"
     output = re.search(patterns, p)
-
     cpu = memory = 0
 
     family = p+'.'+s
@@ -99,7 +97,7 @@ def aws_parseInstanceFamily(instanceFamily: str, region=None) -> Dict[str, str]:
             "attributes": output.group(3),
         }
     }
-
+    
     return result
 
 

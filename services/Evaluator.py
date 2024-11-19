@@ -104,13 +104,15 @@ class Evaluator():
                         startTime = time.time()
                         if debugFlag:
                             print('--- --- fn: ' + method)
-                            
+                        
                         getattr(self, method)()
+                        #print("evaluator.run-{self.classname}")    
+
                         if debugFlag:
                             timeSpent = round(time.time() - startTime, 3)
                             if timeSpent >= 0.2:
                                 _warn("Long running checks {}s".format(timeSpent))
-                        
+
                     except botocore.exceptions.ClientError as e:
                         code = e.response['Error']['Code']
                         msg = e.response['Error']['Message']

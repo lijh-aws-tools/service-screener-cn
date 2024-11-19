@@ -21,14 +21,14 @@ class Cloudwatch(Service):
     def __init__(self, region):
         super().__init__(region)
         ssBoto = self.ssBoto
-        
+
         self.cwClient = ssBoto.client('cloudwatch', config=self.bConfig)
         self.cwLogClient = ssBoto.client('logs', config=self.bConfig)
         self.ctClient = ssBoto.client('cloudtrail', config=self.bConfig)
         
         self.ctLogs = []
         self.logGroups = []
-        
+
         return
     
     ## method to get resources for the services

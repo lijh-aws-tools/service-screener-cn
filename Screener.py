@@ -43,7 +43,7 @@ class Screener:
         service = service.split('::')
         
         _regions = ['GLOBAL'] if service[0] in Config.GLOBAL_SERVICES else regions
-        
+
         scannedKey = 'scanned_'+service[0]
         globalKey = 'GLOBALRESOURCES_'+service[0]
         Config.set(scannedKey, _zeroCount)
@@ -51,20 +51,30 @@ class Screener:
         ## CustomPage Enhancement
         cp = CustomPage()
         cp.resetOutput(service[0])
-        
+
+        print("service scanning:",service[0])
+
         for region in _regions:
             reg = region
             if region == 'GLOBAL':
-                reg = 'us-east-1'
+                reg = 'cn-north-1'
                 # reg = regions[0]
             
-            
+            print("Screener.py-before-cw:")
+
             CURRENT_REGION = reg
             cw = Cloudwatch(reg)
-            
+
+            print("Screener.py-cw:",cw, service[0])
+
             ServiceClass = Screener.getServiceModuleDynamically(service[0])    
+            print("Screener.py-serv:", ServiceClass)
+
             serv = ServiceClass(reg)
-            
+
+            print("Screener.py-serv:",serv)
+
+
             ## Support --filters
             if filters != []:
                 serv.setTags(filters)
@@ -127,7 +137,7 @@ class Screener:
         # print(scannedKey)
         
         scanned['timespent'] = time_end - time_start
-        
+
         with open(_C.FORK_DIR + '/' + service[0] + '.json', 'w') as f:
             json.dump(contexts[service[0]], f)
         
@@ -139,6 +149,7 @@ class Screener:
             json.dump(charts[service[0]], f)
             
         cp.writeOutput(service[0].lower())
+
 
 
     @staticmethod
@@ -153,6 +164,7 @@ class Screener:
         module = 'services.' + folder + '.' + className
         
         ServiceClass = getattr(importlib.import_module(module), className)
+        print("Screener.py-getServiceModuleDynamically-before return")
         return ServiceClass
     
     @staticmethod 

@@ -18,18 +18,22 @@ class Iam(Service):
         super().__init__(region)
         
         ssBoto = self.ssBoto
+
         self.iamClient = ssBoto.client('iam', config=self.bConfig)
-        
+        #print("Iam.py-init: ",self.iamClient)
+
         self.awsClients = {
             'iamClient': self.iamClient,
-            'orgClient': ssBoto.client('organizations'),
+            'orgClient': ssBoto.client('organizations', config=self.bConfig),
             'accClient': ssBoto.client('account', config=self.bConfig),
             'sppClient': ssBoto.client('support', config=self.bConfig),
-            # 'gdClient': ssBoto.client('guardduty', config=self.bConfig),
+            'gdClient': ssBoto.client('guardduty', config=self.bConfig),
             'budgetClient': ssBoto.client('budgets', config=self.bConfig),
-            'curClient': ssBoto.client('cur', config=self.bConfig),
+            #'curClient': ssBoto.client('cur', config=self.bConfig),
             'ctClient': ssBoto.client('cloudtrail', config=self.bConfig)
         }
+        #print("Iam.py-init: ",self.awsClients)
+
     
     ## Groups has no TAG attribute
     ## Unable to implement "TAG" filter

@@ -258,5 +258,5 @@ class Rds(Service):
     
 if __name__ == "__main__":
     Config.init()
-    o = Rds('ap-southeast-1')
+    o = Rds('cn-north-1')
     out = o.advise()

@@ -25,7 +25,7 @@ class IamAccount(IamCommon):
         self.orgClient = awsClients['orgClient']
         
         
-        self.curClient = awsClients['curClient']
+        #self.curClient = awsClients['curClient']
         self.ctClient = awsClients['ctClient']
         
         self.noOfUsers = len(users)
@@ -179,7 +179,15 @@ class IamAccount(IamCommon):
             if region == 'GLOBAL':
                 continue
             
-            conf = bConfig(region_name = region)
+            conf = bConfig(
+                region_name=region,
+                connect_timeout=2,
+                read_timeout=2,
+                retries={'max_attempts': 1},
+                signature_version='v4',
+                # Add proxy settings if needed
+                proxies={'http': '', 'https': ''}
+            )
             gdClient = ssBoto.client('guardduty', config=conf)
         
             resp = gdClient.list_detectors()
@@ -254,19 +262,18 @@ class IamAccount(IamCommon):
                 self.results['hasOrganization'] = [-1, '']
                 return 0
     
-    def _checkCURReport(self):
-        try:
-            results = self.curClient.describe_report_definitions()
-            if len(results.get('ReportDefinitions')) == 0:
-                self.results['enableCURReport'] = [-1, '']
-        except botocore.exceptions.ClientError as e:
-            ecode = e.response['Error']['Code']
-            if e.response['Error']['Code'] == 'AccessDeniedException':
-               _warn('Unable to describe the CUR report. It is likely that this account is part of AWS Organizations')
-            else:
-                print(e)
-        
-        return
+    #def _checkCURReport(self):
+    #    try:
+    #        results = self.curClient.describe_report_definitions()
+    #        if len(results.get('ReportDefinitions')) == 0:
+    #            self.results['enableCURReport'] = [-1, '']
+    #    except botocore.exceptions.ClientError as e:
+    #        ecode = e.response['Error']['Code']
+    #        if e.response['Error']['Code'] == 'AccessDeniedException':
+    #           _warn('Unable to describe the CUR report. It is likely that this account is part of AWS Organizations')
+    #        else:
+    #            print(e)        
+    #    return
 
     def _checkConfigEnabled(self):
         ssBoto = self.ssBoto
@@ -278,11 +285,18 @@ class IamAccount(IamCommon):
         for region in regions:
             if region == 'GLOBAL':
                 continue
-            
-            conf = bConfig(region_name = region)
+            conf = bConfig(
+                region_name=region,
+                connect_timeout=2,
+                read_timeout=2,
+                retries={'max_attempts': 1},
+                signature_version='v4',
+                # Add proxy settings if needed
+                proxies={'http': '', 'https': ''}
+            )
             cfg = ssBoto.client('config', config=conf)
-            
             resp = cfg.describe_configuration_recorders()
+
             recorders = resp.get('ConfigurationRecorders')
             r = 1
             if len(recorders) == 0:

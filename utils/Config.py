@@ -31,7 +31,7 @@ class Config:
         'lambda'    
     ]
     
-    CURRENT_REGION = 'us-east-1'
+    CURRENT_REGION = 'cn-north-1'
     
     ######
     ## This is for capturing 
@@ -99,7 +99,7 @@ class Config:
         print(" -- Acquiring identify info...")
         
         ssBoto = Config.get('ssBoto', None)
-        
+
         stsClient = ssBoto.client('sts')
         
         resp = stsClient.get_caller_identity()
@@ -119,19 +119,24 @@ class Config:
        
     @staticmethod 
     def set(key, val):
+        #print('Config.py-set-key:',key)
+        #print('Config.py-set-val', val)
         cache[key] = val
+        #print('Config.py-set-key:', cache[key],val)
 
     @staticmethod
     def get(key, defaultValue = False):
         ## <TODO>, fix the DEBUG variable
         DEBUG = False
         if key in cache:
+            #print('Config.py-get-key:',key, cache[key])
             return cache[key]
+            
         
         if defaultValue == False:
             if DEBUG:
                 traceback.print_exc()
-        
+        #print('Config.py-get:',defaultValue)
         return defaultValue
         
     @staticmethod

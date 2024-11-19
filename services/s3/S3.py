@@ -12,7 +12,7 @@ from botocore.config import Config as bConfig
 # import drivers here
 from services.s3.drivers.S3Bucket import S3Bucket
 from services.s3.drivers.S3Control import S3Control
-from services.s3.drivers.S3Macie import S3Macie
+#from services.s3.drivers.S3Macie import S3Macie
 
 from utils.Tools import _pi
 
@@ -26,7 +26,7 @@ class S3(Service):
         ssBoto = self.ssBoto
         self.s3Client = ssBoto.client('s3', config=self.bConfig)
         self.s3Control = ssBoto.client('s3control', config=self.bConfig)
-        self.macieV2Client = ssBoto.client('macie2', config=self.bConfig)
+        #self.macieV2Client = ssBoto.client('macie2', config=self.bConfig)
         
         # buckets = Config.get('s3::buckets', [])
     
@@ -52,7 +52,7 @@ class S3(Service):
                     reg = loc.get('LocationConstraint')
                     
                     if reg == None:
-                        reg = 'us-east-1'
+                        reg = 'cn-north-1'
                         
                     if not reg in buckets:
                         buckets[reg] = []
@@ -110,10 +110,10 @@ class S3(Service):
             objs["Bucket::" + bucket['Name']] = obj.getInfo()
             del obj
         
-        _pi('S3Macie')
-        obj = S3Macie(self.macieV2Client)
-        obj.run(self.__class__)
-        objs["Macie"] = obj.getInfo()
+        #_pi('S3Macie')
+        #obj = S3Macie(self.macieV2Client)
+        #obj.run(self.__class__)
+        #objs["Macie"] = obj.getInfo()
         return objs
 
         

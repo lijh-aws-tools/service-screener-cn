@@ -17,7 +17,7 @@ class Eks(Service):
         ssBoto = self.ssBoto
         self.eksClient = ssBoto.client('eks', config=self.bConfig)
         self.ec2Client = ssBoto.client('ec2', config=self.bConfig)
-        self.iamClient = ssBoto.client('iam')
+        self.iamClient = ssBoto.client('iam', config=self.bConfig)
         
     def getClusters(self):
         arr = []

@@ -462,10 +462,8 @@ class Ec2Instance(Evaluator):
         osType = self.getII('platform')
         if osType != 'linux':
             return
-        
         instanceArr = aws_parseInstanceFamily(self.ec2InstanceData['InstanceType'], region=self.ec2Client.meta.region_name)
         prefixDetail = instanceArr['prefixDetail']
-
         if 'g' not in prefixDetail['attributes']:
             gInstanceType = prefixDetail['family'] + prefixDetail['version'] + 'g.' + instanceArr['suffix']
             nextVersion = str(int(prefixDetail['version']) + 1)
@@ -473,7 +471,6 @@ class Ec2Instance(Evaluator):
             
             if self.checkInstanceTypeAvailable(gInstanceType) or self.checkInstanceTypeAvailable(nextVerInstanceType):
                 self.results['EC2Graviton'] = [-1, self.ec2InstanceData['InstanceType']]
-                
         return
     
     

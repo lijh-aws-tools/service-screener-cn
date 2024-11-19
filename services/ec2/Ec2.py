@@ -35,7 +35,8 @@ class Ec2(Service):
     def __init__(self, region):
         super().__init__(region)
         ssBoto = self.ssBoto
-        
+
+
         self.ec2Client = ssBoto.client('ec2', config=self.bConfig)
         self.ssmClient = ssBoto.client('ssm', config=self.bConfig)
         self.compOptClient = ssBoto.client('compute-optimizer', config=self.bConfig)
@@ -46,10 +47,12 @@ class Ec2(Service):
         self.wafv2Client = ssBoto.client('wafv2', config=self.bConfig)
         self.cwClient = ssBoto.client('cloudwatch', config=self.bConfig)
         
-        self.getOutdateSQLVersion()
-        self.getWindowsVersion()
+        #self.getOutdateSQLVersion()
+        #self.getWindowsVersion()
 
         self.setChartsType(self.CHARTSTYPE)
+
+        print("serChartsType")
         self.setChartData({
             "EC2 Instance Utilization": {
                 'Under Provisioned': 0,
@@ -58,24 +61,26 @@ class Ec2(Service):
                 'Right Sized': 0
             }
         })
-
+        print("selfchartGen")
         self.chartGen = None
     
     def getOutdateSQLVersion(self):
         outdateVersion = Config.get('SQLEolVersion', None)
         if outdateVersion != None:
             return outdateVersion
-        
+        print("startOutdateSQL1")
         try:
             outdateVersion = 2012
             resp = requests.get("https://endoflife.date/api/mssqlserver.json", timeout=10)
+            print("resp:",resp)
             for prod in resp.json():
                 if date.today() > datetime.strptime(prod['eol'], '%Y-%m-%d').date():
                     outdateVersion = prod['cycle'][0:4]
                     break
+            print("startOutdateSQL2")
         except requests.exceptions.RequestException  as e:
             print("Unable to retrieve endoflife mssqlserver information, using default value: 2012")
-        
+        print("SQL Eol Version")
         Config.set('SQLEolVersion', outdateVersion)
         
     
@@ -107,6 +112,7 @@ class Ec2(Service):
             
         except requests.exceptions.RequestException as e:
             print("Unable to retrieve endoflife Windows Server information, using default value: 2012")
+        print("Windows Eol Version")
         
         Config.set('WindowsEolVersion', arr)
         
@@ -135,6 +141,7 @@ class Ec2(Service):
                 if instance['State']['Name'] != 'terminated':
                     resources.append(arr)
                     break
+        print("getResources", resources)
         
         return resources
     
@@ -502,27 +509,27 @@ class Ec2(Service):
         
         # compute optimizer checks
         hasRunComputeOpt = Config.get('EC2_HasRunComputeOpt', False)
-        if hasRunComputeOpt == False:
-            try:
-                compOptPath = "/aws/service/global-infrastructure/regions/" + self.region + "/services/compute-optimizer";
-                compOptCheck = self.ssmClient.get_parameters_by_path(
-                    Path = compOptPath    
-                )
+        #if hasRunComputeOpt == False:
+        #    try:
+        #        compOptPath = "/aws/service/global-infrastructure/regions/" + self.region + "/services/compute-optimizer"
+        #        compOptCheck = self.ssmClient.get_parameters_by_path(
+        #            Path = compOptPath    
+        #        )
                 
-                if 'Parameters' in compOptCheck and len(compOptCheck['Parameters']) > 0:
-                    _pi('Compute Optimizer Recommendations')
-                    obj = Ec2CompOpt(self.compOptClient)
-                    obj.run(self.__class__)
-                    objs['ComputeOptimizer'] = obj.getInfo()
-                    Config.set('EC2_HasRunComputeOpt', True)
+        #        if 'Parameters' in compOptCheck and len(compOptCheck['Parameters']) > 0:
+        #            _pi('Compute Optimizer Recommendations')
+        #            obj = Ec2CompOpt(self.compOptClient)
+        #            obj.run(self.__class__)
+        #            objs['ComputeOptimizer'] = obj.getInfo()
+        #            Config.set('EC2_HasRunComputeOpt', True)
                     
-            except botocore.exceptions.ClientError as e:
-                ecode = e.response['Error']['Code']
-                emsg = e.response['Error']['Message']
-                print(ecode, emsg)     
-            except Exception as e:
-                print(e)
-                print("!!! Skipping compute optimizer check for <" + self.region + ">")
+        #    except botocore.exceptions.ClientError as e:
+        #        ecode = e.response['Error']['Code']
+        #        emsg = e.response['Error']['Message']
+        #        print(ecode, emsg)     
+        #    except Exception as e:
+        #        print(e)
+        #        print("!!! Skipping compute optimizer check for <" + self.region + ">")
             
         
         #EC2 Cost Explorer checks
