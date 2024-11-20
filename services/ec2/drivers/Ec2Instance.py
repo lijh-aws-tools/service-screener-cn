@@ -18,7 +18,7 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         return super().default(obj)
 
-        # print(json.dumps(self.ec2InstanceData, indent=4, cls=DateTimeEncoder))
+        # #print(json.dumps(self.ec2InstanceData, indent=4, cls=DateTimeEncoder))
 
 
 class Ec2Instance(Evaluator):
@@ -34,6 +34,7 @@ class Ec2Instance(Evaluator):
     
         self.addII('platform', ec2InstanceData['Platform'] if 'Platform' in ec2InstanceData else 'linux')
         self.addII('instanceType', ec2InstanceData['InstanceType'])
+        #print("EC2Instance.py-self", self)
     
     # supporting functions
     def getCPUUtil(self):
@@ -42,7 +43,7 @@ class Ec2Instance(Evaluator):
     def getEC2UtilizationMetrics(self, metricName, verifyDay, statistics=['Average']):
         cwClient = self.cwClient
         instance = self.ec2InstanceData
-        
+        #print("EC2Instance.py-getEC2UtilizationMetrics")
         dimensions = [
             {
                 'Name': 'InstanceId',
@@ -63,6 +64,7 @@ class Ec2Instance(Evaluator):
         return results
     
     def checkMetricsLowUsage(self, metricName, verifyDay, thresholdDay, thresholdValue):
+        #print("EC2Instance.py-checkMetricsLowUsage")
         result = self.getEC2UtilizationMetrics(metricName, verifyDay)
         cnt = 0
         if len(result['Datapoints']) < verifyDay:
@@ -78,7 +80,7 @@ class Ec2Instance(Evaluator):
         
     def checkMetricsHighUsage(self, metricName, verifyDay, thresholdDay, thresholdValue):
         result = self.getEC2UtilizationMetrics(metricName, verifyDay)
-        
+        #print("EC2Instance.py-1")
         if len(result['Datapoints']) < verifyDay:
             return False
         
@@ -94,7 +96,7 @@ class Ec2Instance(Evaluator):
 
     def checkMetricsSpikyUsage(self, metricName, verifyDay, thresholdDay, maxThresholdValue, avgThresholdValue, statistics):
         result = self.getEC2UtilizationMetrics(metricName, verifyDay, statistics)
-        
+        #print("EC2Instance.py-2")
         if len(result['Datapoints']) < verifyDay:
             return False
         
@@ -110,7 +112,7 @@ class Ec2Instance(Evaluator):
     
     def setTimeDeltaInDays(self):
         launchTimeData = self.ec2InstanceData['LaunchTime']
-        
+        #print("EC2Instance.py-3")
         timeDelta = datetime.datetime.now().timestamp() - launchTimeData.timestamp()
         launchDay = int(timeDelta / (60*60*24))
         
@@ -121,7 +123,7 @@ class Ec2Instance(Evaluator):
         imageId = self.ec2InstanceData['ImageId']
         resp = self.ec2Client.describe_images(ImageIds=[imageId])
         images = resp.get('Images')
-        
+        #print("EC2Instance.py-4")
         self.ec2ImageInfo = None
         for image in images:
             self.ec2ImageInfo = image
@@ -129,7 +131,7 @@ class Ec2Instance(Evaluator):
     # checks
     def _checkSQLServerEdition(self):
         EolVersion = Config.get('SQLEolVersion', 2012)
-
+        #print("EC2Instance.py-5")
         if self.ec2ImageInfo == None:
             return 
             
@@ -143,36 +145,39 @@ class Ec2Instance(Evaluator):
                 if EolVersion >= sqlVers:
                     self.results['SQLServerEOL'] = [-1, image['Name']]
     
-    def _checkWindowsServerEdition(self):
-        if self.ec2ImageInfo == None:
-            return
+    # def _checkWindowsServerEdition(self):
+    #     #print("EC2Instance.py-6")
+    #     if self.ec2ImageInfo == None:
+    #         return
         
-        image = self.ec2ImageInfo
+    #     image = self.ec2ImageInfo
         
-        if 'Platform' in image and not image['Platform'] == 'windows':
-            return
+    #     if 'Platform' in image and not image['Platform'] == 'windows':
+    #         return
         
-        if 'Name' in image and 'Windows_Server' in image['Name']:
-            nameInfo = image['Name'].split('-')
-            if len(nameInfo) <= 2:
-                ## Unable to detect OS version from name, skip
-                return
+    #     if 'Name' in image and 'Windows_Server' in image['Name']:
+    #         nameInfo = image['Name'].split('-')
+    #         if len(nameInfo) <= 2:
+    #             ## Unable to detect OS version from name, skip
+    #             return
             
-            if len(nameInfo[1]) == 4:
-                EolVersion = Config.get('WindowsEolVersion', 2012)
-                
-                if not nameInfo[1] in EolVersion:
-                    _warn("Windows Edition not found in EOL Lookup: {}".format(nameInfo[1]))
-                else:
-                    eolInfo = EolVersion[nameInfo[1]]
-                    if eolInfo['isOutdate']:
-                        self.results['WindowsOSOutdated'] = [-1, nameInfo[1]]
-                    elif eolInfo['isLatest'] == False:
-                        self.results['WindowsOSNotLatest'] = [-1, nameInfo[1]]
-                    else:
-                        return
+    #         if len(nameInfo[1]) == 4:
+    #             EolVersion = Config.get('WindowsEolVersion', 2012)
+    #             print("Ec2Instance.py-nameInfo", nameInfo)
+    #             print("Ec2Instance.py-nameInfo", EolVersion)
+    #             if not nameInfo[1] in EolVersion:
+    #                 _warn("Windows Edition not found in EOL Lookup: {}".format(nameInfo[1]))
+    #             else:
+    #                 eolInfo = EolVersion[nameInfo[1]]
+    #                 if eolInfo['isOutdate']:
+    #                     self.results['WindowsOSOutdated'] = [-1, nameInfo[1]]
+    #                 elif eolInfo['isLatest'] == False:
+    #                     self.results['WindowsOSNotLatest'] = [-1, nameInfo[1]]
+    #                 else:
+    #                     return
         
     def _checkInstanceTypeGeneration(self):
+        #print("EC2Instance.py-7")
         instanceArr = aws_parseInstanceFamily(self.ec2InstanceData['InstanceType'], region=self.ec2Client.meta.region_name)
         instancePrefixArr = instanceArr['prefixDetail']
         
@@ -193,7 +198,7 @@ class Ec2Instance(Evaluator):
         return
         
     def _checkDetailedMonitoringEnabled(self):
-
+        #print("EC2Instance.py-8")
         if self.ec2InstanceData['Monitoring']['State'] == 'disabled':
             self.results['EC2DetailedMonitor'] = [-1, 'Disabled']
         else:
@@ -202,11 +207,13 @@ class Ec2Instance(Evaluator):
         return
         
     def _checkIamProfileAssociated(self):
+        #print("EC2Instance.py-9")
         if "IamInstanceProfile" not in self.ec2InstanceData:
             self.results['EC2IamProfile'] = [-1, '']
         return
     
     def _checkCWMemoryMetrics(self):
+        #print("EC2Instance.py-10")
         cw_client = self.cwClient
         instance = self.ec2InstanceData
     
@@ -222,7 +229,7 @@ class Ec2Instance(Evaluator):
             Namespace='CWAgent',
             Dimensions=dimensions
         )
-    
+        #print('MemMetrics',result['Metrics'])
         if result['Metrics']:
             return
     
@@ -239,6 +246,7 @@ class Ec2Instance(Evaluator):
         return
         
     def _checkCWDiskMetrics(self):
+        #print("EC2Instance.py-11")
         cwClient = self.cwClient
         instance = self.ec2InstanceData
         
@@ -248,13 +256,15 @@ class Ec2Instance(Evaluator):
                 'Value': instance['InstanceId']
             }
         ]
-        
+
         result = cwClient.list_metrics(
             MetricName='disk_used_percent',
             Namespace='CWAgent',
             Dimensions=dimensions
         )
-        
+
+        #print('MemMetrics',result['Metrics'])
+
         if result['Metrics']:
             return
         
@@ -305,12 +315,14 @@ class Ec2Instance(Evaluator):
     #     return
         
     def _checkSecurityGroupsAttached(self):
+        #print("EC2Instance.py-12")
         instance = self.ec2InstanceData
     
         if len(instance['SecurityGroups']) > 50:
             self.results['EC2SGNumber'] = [-1, len(instance['SecurityGroups'])]
     
     def _checkEC2LowUtilization(self):
+        #print("EC2Instance.py-13")
         instance = self.ec2InstanceData
         launchDay = self.launchTimeDeltaInDays
     
@@ -343,6 +355,7 @@ class Ec2Instance(Evaluator):
 
 
     def _checkEC2HighUtilization(self):
+        #print("EC2Instance.py-14")
         instance = self.ec2InstanceData
         launchDay = self.launchTimeDeltaInDays
     
@@ -362,6 +375,7 @@ class Ec2Instance(Evaluator):
         return
     
     def _checkEC2SpikyUtilization(self):
+        #print("EC2Instance.py-15")
         instance = self.ec2InstanceData
         launchDay = self.launchTimeDeltaInDays
 
@@ -382,6 +396,7 @@ class Ec2Instance(Evaluator):
         return
     
     def _checkEC2PublicIP(self):
+        #print("EC2Instance.py-16")
         instance = self.ec2InstanceData
         
         if instance.get('PublicIpAddress') is None:
@@ -402,6 +417,7 @@ class Ec2Instance(Evaluator):
         return
     
     def _checkEC2SubnetAutoPublicIP(self):
+        #print("EC2Instance.py-17")
         instance = self.ec2InstanceData
         
         results = self.ec2Client.describe_subnets(
@@ -415,11 +431,13 @@ class Ec2Instance(Evaluator):
         return
     
     def _checkEC2HasTag(self):
+        #print("EC2Instance.py-18")
         if self.ec2InstanceData.get('Tags') is None:
             self.results['EC2HasTag'] = [-1, '']
         return
     
     def checkInstanceTypeAvailable(self, instanceType):
+        #print("EC2Instance.py-19")
         resp = self.ec2Client.describe_instance_type_offerings(
             LocationType='region',
             Filters=[
@@ -441,8 +459,10 @@ class Ec2Instance(Evaluator):
             return True
     
     def _checkEC2AMD(self):
+        # #print("EC2Instance.py-20")
         osType = self.getII('platform')
         if osType == 'linux':
+            # #print("EC2AMD:linux")
             return
         
         instanceArr = aws_parseInstanceFamily(self.ec2InstanceData['InstanceType'], region=self.ec2Client.meta.region_name)
@@ -455,26 +475,35 @@ class Ec2Instance(Evaluator):
             
             if self.checkInstanceTypeAvailable(amdInstanceType) or self.checkInstanceTypeAvailable(nextVerInstanceType):
                 self.results['EC2AMD'] = [-1, self.ec2InstanceData['InstanceType']]
-                
+        
+        # #print("EC2AMD:",self.results['EC2AMD'])
         return
     
     def _checkEC2Graviton(self):
+        #print("EC2Instance.py-21")
         osType = self.getII('platform')
+        ##print("EC2Instance.py-21:osType",osType)
+
         if osType != 'linux':
+            #print("EC2Gravition:linux")
             return
         instanceArr = aws_parseInstanceFamily(self.ec2InstanceData['InstanceType'], region=self.ec2Client.meta.region_name)
+        ##print("EC2Gravition:",  instanceArr)
         prefixDetail = instanceArr['prefixDetail']
+        ##print("EC2Gravition:", prefixDetail, instanceArr)
         if 'g' not in prefixDetail['attributes']:
             gInstanceType = prefixDetail['family'] + prefixDetail['version'] + 'g.' + instanceArr['suffix']
             nextVersion = str(int(prefixDetail['version']) + 1)
             nextVerInstanceType = prefixDetail['family'] + nextVersion + 'g.' + instanceArr['suffix']
-            
+            #print("EC2Gravition: g not in Prefix")
             if self.checkInstanceTypeAvailable(gInstanceType) or self.checkInstanceTypeAvailable(nextVerInstanceType):
                 self.results['EC2Graviton'] = [-1, self.ec2InstanceData['InstanceType']]
+        ##print("EC2Gravition:",self.results['EC2Graviton'])
         return
     
     
     def _checkTags(self):
+        #print("EC2Instance.py-22")
         tags = self.ec2InstanceData['Tags']
         
         keyTags = []

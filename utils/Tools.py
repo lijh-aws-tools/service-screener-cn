@@ -4,6 +4,7 @@ import time
 from functools import lru_cache
 
 from pprint import pprint
+from botocore.config import Config as bConfig
 from utils.Config import Config
 from typing import Set, Dict, Union
 from netaddr import IPAddress
@@ -49,7 +50,8 @@ def aws_parseInstanceFamily(instanceFamily: str, region=None) -> Dict[str, str]:
         CURRENT_REGION = region
     else:
         CURRENT_REGION = Config.CURRENT_REGION
-
+    # print("region:"+region+"  CURRENT_REGION:", CURRENT_REGION)
+    # print('Tools.py-aws_parseInstanceFamily')
     arr = instanceFamily.split('.')
     if len(arr) > 3 or len(arr) == 1:
         # for invalid strings
@@ -69,8 +71,16 @@ def aws_parseInstanceFamily(instanceFamily: str, region=None) -> Dict[str, str]:
     CACHE_KEYWORD = 'INSTANCE_SPEC::' + family
     spec = Config.get(CACHE_KEYWORD, [])
     ssBoto = Config.get('ssBoto', None)
+    config= bConfig(region_name=CURRENT_REGION,
+            connect_timeout=2,
+            read_timeout=2,
+            retries={'max_attempts': 1},
+            signature_version='v4',
+            # Add proxy settings if needed
+            proxies={'http': '', 'https': ''}
+        )
     if not spec:
-        ec2c = ssBoto.client('ec2', region_name=CURRENT_REGION)
+        ec2c = ssBoto.client('ec2', config=config)
         resp = ec2c.describe_instance_types(InstanceTypes=[family])
         
         iType = resp.get('InstanceTypes')
@@ -97,7 +107,7 @@ def aws_parseInstanceFamily(instanceFamily: str, region=None) -> Dict[str, str]:
             "attributes": output.group(3),
         }
     }
-    
+    # print("Tools.py-aws_parseInstanceFamily-result")
     return result
 
 

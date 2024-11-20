@@ -116,8 +116,10 @@ for acctId, cred in rolesCred.items():
     if acctId != 'default':
         newSess = boto3.session.Session(**tcred)
         Config.set('ssBoto', newSess)
+        print("main.py-newSess", newSess)
     else:
         Config.set('ssBoto', defaultBoto3)
+        print("main.py-defaultSess", defaultBoto3)
 
     
     Config.set('scanned', {'resources': 0, 'rules': 0, 'exceptions': 0})

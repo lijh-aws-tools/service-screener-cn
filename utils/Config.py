@@ -122,21 +122,20 @@ class Config:
         #print('Config.py-set-key:',key)
         #print('Config.py-set-val', val)
         cache[key] = val
-        #print('Config.py-set-key:', cache[key],val)
+        # print('Config.py-set-key:', key, cache[key])
 
     @staticmethod
     def get(key, defaultValue = False):
         ## <TODO>, fix the DEBUG variable
         DEBUG = False
         if key in cache:
-            #print('Config.py-get-key:',key, cache[key])
+            # print('Config.py-get-key:',key, cache[key])
             return cache[key]
-            
         
         if defaultValue == False:
             if DEBUG:
                 traceback.print_exc()
-        #print('Config.py-get:',defaultValue)
+        # print('Config.py-get:',defaultValue)
         return defaultValue
         
     @staticmethod

@@ -77,22 +77,22 @@ class LambdaCommon(Evaluator):
         
         self.results['UseArmArchitecture'] = [-1, ', '.join(self.lambda_['Architectures'])]
     
-    def _check_function_url_in_used_and_auth(self):
-        try:
-            url_config = self.lambda_client.list_function_url_configs(
-                FunctionName=self.function_name
-            )
-            if url_config['FunctionUrlConfigs']:
-                self.results['lambdaURLInUsed'] = [-1, "Enabled"]
+    # def _check_function_url_in_used_and_auth(self):
+    #     try:
+    #         url_config = self.lambda_client.list_function_url_configs(
+    #             FunctionName=self.function_name
+    #         )
+    #         if url_config['FunctionUrlConfigs']:
+    #             self.results['lambdaURLInUsed'] = [-1, "Enabled"]
 
-                for config in url_config['FunctionUrlConfigs']:
-                    if config['AuthType'] == 'NONE':
-                        self.results['lambdaURLWithoutAuth'] = [-1, config['AuthType']]
-                        return
+    #             for config in url_config['FunctionUrlConfigs']:
+    #                 if config['AuthType'] == 'NONE':
+    #                     self.results['lambdaURLWithoutAuth'] = [-1, config['AuthType']]
+    #                     return
 
-        except botocore.exceptions.ClientError as e:
-            print("No permission to access lambda:list_function_url_configs")
-        return
+    #     except botocore.exceptions.ClientError as e:
+    #         print("No permission to access lambda:list_function_url_configs")
+    #     return
 
     def _check_missing_role(self):
         role_arn = self.lambda_['Role']

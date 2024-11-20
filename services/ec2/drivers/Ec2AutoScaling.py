@@ -43,7 +43,6 @@ class Ec2AutoScaling(Evaluator):
     
     def _checkTargetGroupELBAssociation(self):
         asg = self.asg
-        
         if len(asg['TargetGroupARNs']) == 0:
             return
         
@@ -100,9 +99,10 @@ class Ec2AutoScaling(Evaluator):
                 LaunchTemplateId = templateId,
                 Versions = [tempalteVersion]
             )
-            
             for version in templateResult['LaunchTemplateVersions']:
-                imageId = version['LaunchTemplateVersions']['ImageId']
+                print("version", version)
+
+                imageId = version['LaunchTemplateData']['ImageId']
                 if version.get('LaunchTemplateData').get('MetadataOptions') is None:
                     self.results['ASGIMDSv2'] = [-1, '']
                 else:

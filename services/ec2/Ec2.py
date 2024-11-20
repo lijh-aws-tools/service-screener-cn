@@ -2,7 +2,7 @@
 
 import boto3
 import botocore
-import requests
+import requests # type: ignore
 from datetime import date, datetime, timedelta
 
 import re
@@ -36,7 +36,7 @@ class Ec2(Service):
         super().__init__(region)
         ssBoto = self.ssBoto
 
-
+        print("EC2 start init")
         self.ec2Client = ssBoto.client('ec2', config=self.bConfig)
         self.ssmClient = ssBoto.client('ssm', config=self.bConfig)
         self.compOptClient = ssBoto.client('compute-optimizer', config=self.bConfig)
@@ -52,7 +52,6 @@ class Ec2(Service):
 
         self.setChartsType(self.CHARTSTYPE)
 
-        print("serChartsType")
         self.setChartData({
             "EC2 Instance Utilization": {
                 'Under Provisioned': 0,
@@ -61,7 +60,6 @@ class Ec2(Service):
                 'Right Sized': 0
             }
         })
-        print("selfchartGen")
         self.chartGen = None
     
     def getOutdateSQLVersion(self):
@@ -71,8 +69,8 @@ class Ec2(Service):
         print("startOutdateSQL1")
         try:
             outdateVersion = 2012
-            resp = requests.get("https://endoflife.date/api/mssqlserver.json", timeout=10)
-            print("resp:",resp)
+            resp = requests.get("https://endoflife.date/api/mssqlserver.json")
+
             for prod in resp.json():
                 if date.today() > datetime.strptime(prod['eol'], '%Y-%m-%d').date():
                     outdateVersion = prod['cycle'][0:4]
@@ -547,9 +545,11 @@ class Ec2(Service):
         for instanceArr in instances:
             for instanceData in instanceArr['Instances']:
                 _pi('EC2', instanceData['InstanceId'])
+                # print("EC2.py-Ec2-advice",instanceData)
                 obj = Ec2Instance(instanceData,self.ec2Client, self.cwClient)
                 obj.run(self.__class__)
-                
+                # print("Ec2.py-Ec2-advise",obj)
+
                 objs[f"EC2::{instanceData['InstanceId']}"] = obj.getInfo()
                 self.setChartData(obj.getChartData())
                 
