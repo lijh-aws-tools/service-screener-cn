@@ -4,6 +4,7 @@ An open source guidance tool for the AWS environment. Click [here](https://bit.l
 
 Disclaimer: The generated report has to be hosted locally and MUST NOT be internet accessible
 
+
 ## Overview
 Service Screener is a tool that runs automated checks on AWS environments and provides recommendations based on AWS and community best practices. 
 
@@ -26,16 +27,12 @@ Running this tool is free as it is covered under the AWS Free Tier. If you have 
    c. cloudformation:DeleteStack
 
 ## Installing service-screener V2
-1. [Log in to your AWS account](https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#start-session) using the IAM User with sufficient permissions described above. 
-2. Launch [AWS CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#launch-region-shell) in any region. 
+此Repo专门用于中国区。
+因中国区无Cloudshell支持，在中国区运行screener需要自行安装环境。
+可以使用EC2，安装Python3环境，并配置权限（IAM ROle，需要能够创建cloudformation stack的权限及需要扫描资源的只读权限）。
+也可以在本地环境（Mac Terminal）运行此工具。
 
-<details>
-<summary>Launch AWS Cloudshell Walkthrough</summary>
-   
-![Launch AWS CloudShell](https://d39bs20xyg7k53.cloudfront.net/services-screener/p1-cloudshell.gif)
-</details>
-
-In the AWS CloudShell terminal, run this script this to install the dependencies:
+In the terminal, run this script this to install the dependencies:
 ```bash
 cd /tmp
 python3 -m venv .
@@ -62,32 +59,32 @@ We recommend running it in all regions where you have deployed workloads in. Adj
 
 **Example 1: (Recommended) Run in the Singapore region, check all services with beta features enabled**
 ```
-screener --regions ap-southeast-1 --beta 1
+screener --regions cn-northwest-1 --beta 1
 ```
 
 **Example 1a: Run in the Singapore region, check all services on stable releases**
 ```
-screener --regions ap-southeast-1
+screener --regions cn-northwest-1
 ```
 
 **Example 2: Run in the Singapore region, check only Amazon S3**
 ```
-screener --regions ap-southeast-1 --services s3
+screener --regions cn-northwest-1 --services s3
 ```
 
 **Example 3: Run in the Singapore & North Virginia regions, check all services**
 ```
-screener --regions ap-southeast-1,us-east-1
+screener --regions cn-northwest-1,us-east-1
 ```
 
 **Example 4: Run in the Singapore & North Virginia regions, check RDS and IAM**
 ```
-screener --regions ap-southeast-1,us-east-1 --services rds,iam
+screener --regions cn-northwest-1,us-east-1 --services rds,iam
 ```
 
 **Example 5: Run in the Singapore region, filter resources based on tags (e.g: Name=env Values=prod and Name=department Values=hr,coe)**
 ```
-screener --regions ap-southeast-1 --tags env=prod%department=hr,coe
+screener --regions cn-northwest-1 --tags env=prod%department=hr,coe
 ```
 
 **Example 6: Run in all regions and all services**
@@ -110,10 +107,10 @@ screener --regions ALL
 --others '{"mpe": {"id": "aaaa-1111-cccc"}}'
 
 # To override default Well Architected Tools integration parameter
---others '{"WA": {"region": "ap-southeast-1", "reportName":"SS_Report", "newMileStone":0}}'
+--others '{"WA": {"region": "cn-northwest-1", "reportName":"SS_Report", "newMileStone":0}}'
 
 # you can combine both
---others '{"WA": {"region": "ap-southeast-1", "reportName":"SS_Report", "newMileStone":0}, "mpe": {"id": "aaaa-1111-cccc"}}'
+--others '{"WA": {"region": "cn-northwest-1", "reportName":"SS_Report", "newMileStone":0}, "mpe": {"id": "aaaa-1111-cccc"}}'
 ```
 <details>
 <summary>Get Report Walkthrough</summary>
@@ -160,4 +157,3 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ## License
 This project is licensed under the Apache-2.0 License.
-

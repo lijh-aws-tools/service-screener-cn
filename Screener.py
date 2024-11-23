@@ -60,20 +60,12 @@ class Screener:
                 reg = 'cn-north-1'
                 # reg = regions[0]
             
-            print("Screener.py-before-cw:")
-
             CURRENT_REGION = reg
             cw = Cloudwatch(reg)
 
-            print("Screener.py-cw:",cw, service[0])
-
             ServiceClass = Screener.getServiceModuleDynamically(service[0])    
-            print("Screener.py-serv:", ServiceClass)
 
             serv = ServiceClass(reg)
-
-            print("Screener.py-serv:",serv)
-
 
             ## Support --filters
             if filters != []:
