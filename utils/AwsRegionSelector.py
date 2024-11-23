@@ -15,41 +15,41 @@ class AwsRegionSelector:
             print('BOTO3 SESSION IS MISSING IN REGION SELECTOR')
             exit()
        
-        DEBUG = Config.get('DEBUG')
-        if not minimal and AwsRegionSelector.prompt_confirm_get_all_regions() == False:
-            sys.exit('__SCRIPT HALT__, user decided not to proceed')
+        # DEBUG = Config.get('DEBUG')
+        # if not minimal and AwsRegionSelector.prompt_confirm_get_all_regions() == False:
+        #     sys.exit('__SCRIPT HALT__, user decided not to proceed')
         
-        conf = bConfig(
-            region_name = 'us-east-1'    
-        )
-        acct = ssBoto.client('account')
+        # conf = bConfig(
+        #     region_name = 'cn-north-1'    
+        # )
+        # acct = ssBoto.client('account')
         
-        results = {}
-        regions = []
-        token = None
-        while True:
-            if token == None:
-                results = acct.list_regions(
-                    RegionOptStatusContains=['ENABLED', 'ENABLED_BY_DEFAULT'],
-                    MaxResults=20
-                )
-            else:
-                results = acct.list_regions(
-                    RegionOptStatusContains=['ENABLED', 'ENABLED_BY_DEFAULT'],
-                    NextToken = token,
-                    MaxResults=20
-                )
+        # results = {}
+        regions = ['cn-north-1', 'cn-northwest-1']
+        # token = None
+        # while True:
+        #     if token == None:
+        #         results = acct.list_regions(
+        #             RegionOptStatusContains=['ENABLED', 'ENABLED_BY_DEFAULT'],
+        #             MaxResults=20
+        #         )
+        #     else:
+        #         results = acct.list_regions(
+        #             RegionOptStatusContains=['ENABLED', 'ENABLED_BY_DEFAULT'],
+        #             NextToken = token,
+        #             MaxResults=20
+        #         )
             
-            token = results.get('NextToken')
-            for info in results.get('Regions'):
-                regions.append(info['RegionName'])
+        #     token = results.get('NextToken')
+        #     for info in results.get('Regions'):
+        #         regions.append(info['RegionName'])
             
-            if not token:
-                break
+        #     if not token:
+        #         break
         
-        # if DEBUG and not minimal:
-        _info("The following region(s) are enabled/opt-in")
-        _info('[' + str(len(regions)) + "] | " + ', '.join(regions))
+        # # if DEBUG and not minimal:
+        # _info("The following region(s) are enabled/opt-in")
+        # _info('[' + str(len(regions)) + "] | " + ', '.join(regions))
         
         return regions
         

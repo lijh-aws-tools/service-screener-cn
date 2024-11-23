@@ -15,7 +15,7 @@ class CfnTrail():
         self.stackName = None
         self.cfnTemplate = "zNullResourcesCfn.yml"
         self.stackPrefix = "ssv2-"
-        self.defaultRegion = "us-east-1"
+        self.defaultRegion = "cn-north-1"
         self.ymlBody='''
 AWSTemplateFormatVersion: '2010-09-09'
 Description: '[aws-gh-ss-v2] Service Screener V2{}'
@@ -40,13 +40,16 @@ Outputs:
         # self.boto3init()
         
     def boto3init(self, additionalDesc = None):
-        self.bConfig = bConfig(
-            region_name = self.getRegion()
-        )
+        # self.bConfig = bConfig(
+        #     region_name = self.getRegion(),
+        #      signature_version='v4',
+        #     # Add proxy settings if needed
+        #     proxies={'http': '', 'https': ''}
+        # )
         
         ssBoto = Config.get('ssBoto', None)
-        self.cfClient = ssBoto.client('cloudformation', config=self.bConfig)
-
+        self.cfClient = ssBoto.client('cloudformation')#, config=self.bConfig)
+        print("cfclient identity:", self.cfClient.meta.endpoint_url)
         self.additionalDesc = additionalDesc
         
     def createStack(self):

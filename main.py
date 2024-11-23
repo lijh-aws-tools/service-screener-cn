@@ -156,7 +156,6 @@ for acctId, cred in rolesCred.items():
     tempConfig = _AWS_OPTIONS.copy()
     tempConfig['region'] = regions[0]
     
-
     Config.setAccountInfo(tempConfig)
     acctInfo = Config.get('stsInfo')
     print("")
@@ -187,6 +186,7 @@ for acctId, cred in rolesCred.items():
     ## Added mpeid to CFStack
     mpeid = None
     otherParams = _cli_options.get('others', None)
+    
     if otherParams is not None:
         try:
             oparams = json.loads(otherParams)
@@ -203,6 +203,7 @@ for acctId, cred in rolesCred.items():
         if mpeid is not None: 
             cfnAdditionalStr = " --mpeid:{}".format(mpeid)
         CfnTrailObj.boto3init(cfnAdditionalStr)
+        print("CfnTrailObj:", cfnAdditionalStr)
         CfnTrailObj.createStack()
 
     overallTimeStart = time.time()

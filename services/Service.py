@@ -27,11 +27,11 @@ class Service:
         self.region = region
         self.bConfig = bConfig(
             region_name=region,
-            connect_timeout=2,
-            read_timeout=2,
-            retries={'max_attempts': 1},
-            signature_version='v4',
-            # Add proxy settings if needed
+            # connect_timeout=2,
+            # read_timeout=2,
+            # retries={'max_attempts': 1},
+            # signature_version='v4',
+            # # Add proxy settings if needed
             proxies={'http': '', 'https': ''}
         )
         
