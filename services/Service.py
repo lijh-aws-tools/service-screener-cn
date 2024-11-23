@@ -93,8 +93,7 @@ class Service:
         for ke in key:
             f.write('\r\n'.join(items[ke]) + '\r\n')
         f.close()
-            
-        print("I am Here", self.RULESPREFIX)
+
         Config.set(self.RULESPREFIX, [])
         
     def setTags(self, tags):

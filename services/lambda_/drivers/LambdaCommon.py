@@ -109,19 +109,19 @@ class LambdaCommon(Evaluator):
                 raise e
         return
 
-    def _check_code_signing_disabled(self):
-        if self.lambda_['PackageType'] != 'Zip':
-            return
-        try:
-            code_sign = self.lambda_client.get_function_code_signing_config(
-                FunctionName=self.function_name
-            )
-            if not code_sign.get('CodeSigningConfigArn'):
-                self.results['lambdaCodeSigningDisabled'] = [-1, 'Disabled']
-        except botocore.exceptions.ClientError as e:
-            print("No permission to access get_function_code_signing_config")
+    # def _check_code_signing_disabled(self):
+    #     if self.lambda_['PackageType'] != 'Zip':
+    #         return
+    #     try:
+    #         code_sign = self.lambda_client.get_function_code_signing_config(
+    #             FunctionName=self.function_name
+    #         )
+    #         if not code_sign.get('CodeSigningConfigArn'):
+    #             self.results['lambdaCodeSigningDisabled'] = [-1, 'Disabled']
+    #     except botocore.exceptions.ClientError as e:
+    #         print("No permission to access get_function_code_signing_config")
 
-        return
+    #     return
 
     def _check_dead_letter_queue_disabled(self):
         config = self.lambda_client.get_function_configuration(

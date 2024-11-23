@@ -16,7 +16,7 @@ class Cloudfront(Service):
         super().__init__(region)
         
         ssBoto = self.ssBoto
-        self.cloudfrontClient = ssBoto.client('cloudfront')
+        self.cloudfrontClient = ssBoto.client('cloudfront', config=self.bConfig)
         
     def getDistributions(self):
         

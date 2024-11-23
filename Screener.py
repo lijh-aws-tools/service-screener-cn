@@ -156,7 +156,6 @@ class Screener:
         module = 'services.' + folder + '.' + className
         
         ServiceClass = getattr(importlib.import_module(module), className)
-        print("Screener.py-getServiceModuleDynamically-before return")
         return ServiceClass
     
     @staticmethod 

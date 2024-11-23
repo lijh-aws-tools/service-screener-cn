@@ -35,10 +35,10 @@ class S3Bucket(Evaluator):
         if policy_document:
             iam = boto3.client('iam')
             response = iam.simulate_principal_policy(
-                PolicySourceArn=f"arn:aws:s3:::{self.bucket}",
+                PolicySourceArn=f"arn:aws-cn:s3:::{self.bucket}",
                 PolicyInputList=[policy_document],
                 ActionNames=['s3:GetObject', 's3:ListBucket'],
-                ResourceArns=[f"arn:aws:s3:::{self.bucket}", f"arn:aws:s3:::{self.bucket}/*"],
+                ResourceArns=[f"arn:aws-cn:s3:::{self.bucket}", f"arn:aws-cn:s3:::{self.bucket}/*"],
                 PermissionsBoundarySet=[],
                 ContextEntries=[],
                 ResourceHandlingOption='SINGLE_SERVICE_MULTI_RESOURCE'
@@ -56,10 +56,10 @@ class S3Bucket(Evaluator):
         if policy_document:
             iam = boto3.client('iam')
             response = iam.simulate_principal_policy(
-                PolicySourceArn=f"arn:aws:s3:::{self.bucket}",
+                PolicySourceArn=f"arn:aws-cn:s3:::{self.bucket}",
                 PolicyInputList=[policy_document],
                 ActionNames=['s3:PutObject'],
-                ResourceArns=[f"arn:aws:s3:::{self.bucket}", f"arn:aws:s3:::{self.bucket}/*"],
+                ResourceArns=[f"arn:aws-cn:s3:::{self.bucket}", f"arn:aws:s3-cn:::{self.bucket}/*"],
                 PermissionsBoundarySet=[],
                 ContextEntries=[],
                 ResourceHandlingOption='SINGLE_SERVICE_MULTI_RESOURCE'
