@@ -74,12 +74,12 @@ screener --regions cn-northwest-1 --services s3
 
 **Example 3: Run in the Singapore & North Virginia regions, check all services**
 ```
-screener --regions cn-northwest-1,us-east-1
+screener --regions cn-northwest-1,cn-north-1
 ```
 
 **Example 4: Run in the Singapore & North Virginia regions, check RDS and IAM**
 ```
-screener --regions cn-northwest-1,us-east-1 --services rds,iam
+screener --regions cn-northwest-1,cn-north-1 --services rds,iam
 ```
 
 **Example 5: Run in the Singapore region, filter resources based on tags (e.g: Name=env Values=prod and Name=department Values=hr,coe)**
