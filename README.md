@@ -1,4 +1,5 @@
 # Service Screener
+Modified from [AWS/Samples/service-screener-v2](https://github.com/aws-samples/service-screener-v2) to support China region.
 
 An open source guidance tool for the AWS environment. Click [here](https://bit.ly/ssv2demo) for sample report.
 

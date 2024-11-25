@@ -139,7 +139,7 @@ class Ec2(Service):
                 if instance['State']['Name'] != 'terminated':
                     resources.append(arr)
                     break
-        print("getResources", resources)
+        #print("getResources", resources)
         
         return resources
     
