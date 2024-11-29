@@ -145,36 +145,34 @@ class Ec2Instance(Evaluator):
                 if EolVersion >= sqlVers:
                     self.results['SQLServerEOL'] = [-1, image['Name']]
     
-    # def _checkWindowsServerEdition(self):
-    #     #print("EC2Instance.py-6")
-    #     if self.ec2ImageInfo == None:
-    #         return
+    def _checkWindowsServerEdition(self):
+        #print("EC2Instance.py-6")
+        if self.ec2ImageInfo == None:
+            return
         
-    #     image = self.ec2ImageInfo
+        image = self.ec2ImageInfo
         
-    #     if 'Platform' in image and not image['Platform'] == 'windows':
-    #         return
+        if 'Platform' in image and not image['Platform'] == 'windows':
+            return
         
-    #     if 'Name' in image and 'Windows_Server' in image['Name']:
-    #         nameInfo = image['Name'].split('-')
-    #         if len(nameInfo) <= 2:
-    #             ## Unable to detect OS version from name, skip
-    #             return
+        if 'Name' in image and 'Windows_Server' in image['Name']:
+            nameInfo = image['Name'].split('-')
+            if len(nameInfo) <= 2:
+                ## Unable to detect OS version from name, skip
+                return
             
-    #         if len(nameInfo[1]) == 4:
-    #             EolVersion = Config.get('WindowsEolVersion', 2012)
-    #             print("Ec2Instance.py-nameInfo", nameInfo)
-    #             print("Ec2Instance.py-nameInfo", EolVersion)
-    #             if not nameInfo[1] in EolVersion:
-    #                 _warn("Windows Edition not found in EOL Lookup: {}".format(nameInfo[1]))
-    #             else:
-    #                 eolInfo = EolVersion[nameInfo[1]]
-    #                 if eolInfo['isOutdate']:
-    #                     self.results['WindowsOSOutdated'] = [-1, nameInfo[1]]
-    #                 elif eolInfo['isLatest'] == False:
-    #                     self.results['WindowsOSNotLatest'] = [-1, nameInfo[1]]
-    #                 else:
-    #                     return
+            if len(nameInfo[1]) == 4:
+                EolVersion = Config.get('WindowsEolVersion', 2012)
+                if not nameInfo[1] in EolVersion:
+                    _warn("Windows Edition not found in EOL Lookup: {}".format(nameInfo[1]))
+                else:
+                    eolInfo = EolVersion[nameInfo[1]]
+                    if eolInfo['isOutdate']:
+                        self.results['WindowsOSOutdated'] = [-1, nameInfo[1]]
+                    elif eolInfo['isLatest'] == False:
+                        self.results['WindowsOSNotLatest'] = [-1, nameInfo[1]]
+                    else:
+                        return
         
     def _checkInstanceTypeGeneration(self):
         #print("EC2Instance.py-7")

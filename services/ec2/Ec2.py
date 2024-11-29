@@ -3,6 +3,7 @@
 import boto3
 import botocore
 import requests # type: ignore
+import urllib3
 from datetime import date, datetime, timedelta
 
 import re
@@ -36,7 +37,6 @@ class Ec2(Service):
         super().__init__(region)
         ssBoto = self.ssBoto
 
-        print("EC2 start init")
         self.ec2Client = ssBoto.client('ec2', config=self.bConfig)
         self.ssmClient = ssBoto.client('ssm', config=self.bConfig)
         self.compOptClient = ssBoto.client('compute-optimizer', config=self.bConfig)
@@ -47,8 +47,8 @@ class Ec2(Service):
         self.wafv2Client = ssBoto.client('wafv2', config=self.bConfig)
         self.cwClient = ssBoto.client('cloudwatch', config=self.bConfig)
         
-        #self.getOutdateSQLVersion()
-        #self.getWindowsVersion()
+        self.getOutdateSQLVersion()
+        self.getWindowsVersion()
 
         self.setChartsType(self.CHARTSTYPE)
 
@@ -61,25 +61,30 @@ class Ec2(Service):
             }
         })
         self.chartGen = None
-    
+
     def getOutdateSQLVersion(self):
         outdateVersion = Config.get('SQLEolVersion', None)
         if outdateVersion != None:
             return outdateVersion
-        print("startOutdateSQL1")
+        
+        http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=2.0, read=5.0))
+
         try:
             outdateVersion = 2012
-            resp = requests.get("https://endoflife.date/api/mssqlserver.json")
-
-            for prod in resp.json():
+            response = http.request(
+                'GET',
+                'https://endoflife.date/api/mssqlserver.json',
+                headers={'User-Agent': 'YourApp/1.0'}
+            )
+            resp = json.loads(response.data.decode('utf-8'))
+            for prod in resp:
                 if date.today() > datetime.strptime(prod['eol'], '%Y-%m-%d').date():
                     outdateVersion = prod['cycle'][0:4]
                     break
-            print("startOutdateSQL2")
-        except requests.exceptions.RequestException  as e:
+        except Exception as e:
             print("Unable to retrieve endoflife mssqlserver information, using default value: 2012")
-        print("SQL Eol Version")
         Config.set('SQLEolVersion', outdateVersion)
+
         
     
     def getWindowsVersion(self):
@@ -92,10 +97,16 @@ class Ec2(Service):
         arr = {}
         arr['2012'] = {'isOutdate': True, 'isLatest': False}
         arr['2023'] = {'isOutdate': False, 'isLatest': True}
-        
+        http = urllib3.PoolManager(timeout=urllib3.Timeout(connect=2.0, read=5.0))
+
         try:
-            resp = requests.get("https://endoflife.date/api/windows-server.json",  timeout=10)
-            for prod in resp.json():
+            response = http.request(
+                'GET',
+                'https://endoflife.date/api/windows-server.json',
+                headers={'User-Agent': 'YourApp/1.0'}
+            )
+            resp = json.loads(response.data.decode('utf-8'))
+            for prod in resp:
                 if prod['lts'] == 'false':
                     continue
                 eolDate = datetime.strptime(prod['eol'], '%Y-%m-%d').date()
@@ -108,9 +119,8 @@ class Ec2(Service):
                     
             arr[mCycle]['isLatest'] = True
             
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             print("Unable to retrieve endoflife Windows Server information, using default value: 2012")
-        print("Windows Eol Version")
         
         Config.set('WindowsEolVersion', arr)
         

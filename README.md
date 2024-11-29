@@ -121,7 +121,6 @@ screener --regions ALL
 
 ### Downloading the report
 The output is generated as a ~/service-screener-v2/output.zip file. 
-You can [download the file](https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-cloudshell.html#files-storage) in the CloudShell console by clicking the *Download file* button under the *Actions* menu on the top right of the Cloudshell console. 
 
 <details>
 <summary>Download Output & Report Viewing Walkthrough</summary>
