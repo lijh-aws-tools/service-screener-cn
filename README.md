@@ -58,32 +58,32 @@ When running Service Screener, you will need to specify the regions and services
 
 We recommend running it in all regions where you have deployed workloads in. Adjust the code samples below to suit your needs then copy and paste it into Cloudshell to run Service Screener. 
 
-**Example 1: (Recommended) Run in the Singapore region, check all services with beta features enabled**
+**Example 1: (Recommended) Run in the Ningxia region, check all services with beta features enabled**
 ```
 screener --regions cn-northwest-1 --beta 1
 ```
 
-**Example 1a: Run in the Singapore region, check all services on stable releases**
+**Example 1a: Run in the Ningxia region, check all services on stable releases**
 ```
 screener --regions cn-northwest-1
 ```
 
-**Example 2: Run in the Singapore region, check only Amazon S3**
+**Example 2: Run in the Ningxia region, check only Amazon S3**
 ```
 screener --regions cn-northwest-1 --services s3
 ```
 
-**Example 3: Run in the Singapore & North Virginia regions, check all services**
+**Example 3: Run in the Ningxia & Beijing regions, check all services**
 ```
 screener --regions cn-northwest-1,cn-north-1
 ```
 
-**Example 4: Run in the Singapore & North Virginia regions, check RDS and IAM**
+**Example 4: Run in the Ningxia & Beijing regions, check RDS and IAM**
 ```
 screener --regions cn-northwest-1,cn-north-1 --services rds,iam
 ```
 
-**Example 5: Run in the Singapore region, filter resources based on tags (e.g: Name=env Values=prod and Name=department Values=hr,coe)**
+**Example 5: Run in the Ningxia region, filter resources based on tags (e.g: Name=env Values=prod and Name=department Values=hr,coe)**
 ```
 screener --regions cn-northwest-1 --tags env=prod%department=hr,coe
 ```
